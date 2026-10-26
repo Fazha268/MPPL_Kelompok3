@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panduan Pengolahan Sampah Menyeluruh - Sortify AI</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+    <style>
+        :root { --primary-green: #059669; --light-green: #ecfdf5; --accent-green: #10b981; }
+        body { background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%); min-height: 100vh; font-family: 'Segoe UI', system-ui, sans-serif; }
+        .navbar { backdrop-filter: blur(10px); background-color: rgba(5, 150, 105, 0.95) !important; }
+        .card { border: none; border-radius: 1.75rem; box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05); transition: transform 0.3s ease; }
+        .card:hover { transform: translateY(-4px); }
+        .nav-pills .nav-link.active { background-color: var(--primary-green); font-weight: 600; }
+        .nav-pills .nav-link { color: var(--primary-green); font-weight: 500; }
+        .search-box { border-radius: 50px; padding: 0.75rem 1.5rem; border: 2px solid #a7f3d0; }
+        
+        .badge-organik { background-color: #10b981; color: white; }
+        .badge-anorganik { background-color: #0284c7; color: white; }
+        .badge-b3 { background-color: #dc2626; color: white; }
+        .badge-residu { background-color: #6b7280; color: white; }
+        
+        .filter-btn { border-radius: 50px; font-weight: 600; padding: 0.5rem 1.25rem; border: 2px solid #059669; color: #059669; background: white; }
+        .filter-btn:hover, .filter-btn.active { background-color: var(--primary-green) !important; color: white !important; }
+        
+        .sample-list { font-size: 0.85rem; color: #475569; background: #f8fafc; border-radius: 0.75rem; padding: 0.5rem 0.75rem; margin-top: 0.5rem; }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark shadow-sm py-3 mb-4 sticky-top">
+        <div class="container">
+            <a class="navbar-brand fw-bold fs-4 d-flex align-items-center gap-2" href="upload.html">
+                <i class="bi bi-recycle text-light fs-3"></i> Sortify <span class="badge bg-light text-success fs-6">AI Pro</span>
+            </a>
+            <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto ms-lg-4">
+                    <li class="nav-item"><a class="nav-link rounded-pill px-3 py-2" href="upload.html"><i class="bi bi-cpu me-1"></i> Smart Scan</a></li>
+                    <li class="nav-item"><a class="nav-link rounded-pill px-3 py-2" href="dashboard.html"><i class="bi bi-trophy me-1"></i> Leaderboard</a></li>
+                    <li class="nav-item"><a class="nav-link rounded-pill px-3 py-2" href="kuis.html"><i class="bi bi-controller me-1"></i> Kuis Edukasi</a></li>
+                    <li class="nav-item"><a class="nav-link active rounded-pill px-3 py-2" href="panduan.html"><i class="bi bi-journal-text me-1"></i> Panduan</a></li>
+                </ul>
+                <div class="d-flex align-items-center gap-2 mt-3 mt-lg-0">
+                    <a href="profile.html" class="btn btn-light btn-sm rounded-pill px-3 py-2 fw-bold text-success shadow-sm d-flex align-items-center gap-1">
+                        <i class="bi bi-person-circle fs-6"></i> 
+                        <span id="welcomeUserText">Profil</span>
+                    </a>
+                    <button class="btn btn-outline-light btn-sm rounded-pill px-3 py-2 fw-semibold" onclick="logout()">
+                        <i class="bi bi-box-arrow-right me-1"></i> Keluar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container pb-5" style="max-width: 950px;">
+        <!-- Hero Header -->
+        <div class="card shadow-lg p-4 p-md-5 mb-4 text-white text-center" style="background: linear-gradient(135deg, #059669 0%, #047857 100%);">
+            <i class="bi bi-journal-bookmark-fill display-3 text-warning mb-2"></i>
+            <h1 class="fw-bold mb-2">Ensiklopedia Panduan Sampah Menyeluruh</h1>
+            <p class="mb-4 opacity-75">Panduan general dan komprehensif untuk mengidentifikasi serta mengolah berbagai jenis limbah.</p>
+            
+            <div class="mx-auto" style="max-width: 550px;">
+                <div class="input-group shadow-sm">
+                    <span class="input-group-text bg-white border-0 ps-3 rounded-start-pill text-muted"><i class="bi bi-search"></i></span>
+                    <input type="text" id="searchInput" class="form-control border-0 py-3 rounded-end-pill search-box" placeholder="Cari benda apa saja (misal: botol, sisa makanan, popok, oli)..." onkeyup="filterGuides()">
+                </div>
+            </div>
+        </div>
+
+        <!-- Filter Kategori -->
+        <div class="d-flex flex-wrap justify-content-center gap-2 mb-4">
+            <button class="btn filter-btn active" onclick="filterCategory('all', this)">Semua Kategori</button>
+            <button class="btn filter-btn" onclick="filterCategory('organik', this)">🌱 Organik</button>
+            <button class="btn filter-btn" onclick="filterCategory('anorganik', this)">♻️ Anorganik / Daur Ulang</button>
+            <button class="btn filter-btn" onclick="filterCategory('b3', this)">⚠️ B3 & Medis</button>
+            <button class="btn filter-btn" onclick="filterCategory('residu', this)">🗑️ Residu / Khusus</button>
+        </div>
+
+        <!-- Daftar Panduan Menyeluruh -->
+        <div class="row g-4" id="guideContainer">
+            
+            <!-- 1. Sampah Organik Basah -->
+            <div class="col-md-6 guide-item" data-category="organik" data-keywords="sisa makanan nasi sayur buah daging tulang ikan dapur organik basah">
+                <div class="card h-100 p-4 border-start border-4 border-success">
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="fs-1 me-3">🍲</div>
+                        <div>
+                            <span class="badge badge-organik mb-1">Organik Basah</span>
+                            <h5 class="fw-bold m-0">Sisa Makanan, Sayur & Dapur</h5>
+                        </div>
+                    </div>
+                    <p class="text-muted small">Limbah makanan rumah tangga yang cepat membusuk.</p>
+                    <div class="sample-list"><strong>Contoh:</strong> Nasi basi, sisa lauk, kulit buah, sayuran layu, tulang ikan/ayam.</div>
+                    <hr class="text-muted opacity-25 my-3">
+                    <h6 class="fw-bold text-success mb-2 small"><i class="bi bi-check-circle-fill me-1"></i> Cara Pengolahan General:</h6>
+                    <ol class="small text-secondary ps-3 mb-0">
+                        <li>Tiriskan kadar air atau kuah berlebih agar tidak menjadi sarang lalat.</li>
+                        <li>Olah menjadi pupuk kompos cair/padat, pakan maggot BSF, atau kubur di lubang biopori.</li>
+                    </ol>
+                </div>
+            </div>
+
+            <!-- 2. Sampah Organik Kering -->
+            <div class="col-md-6 guide-item" data-category="organik" data-keywords="daun kering ranting kayu rumput jerami kebun organik kering">
+                <div class="card h-100 p-4 border-start border-4 border-success">
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="fs-1 me-3">🍂</div>
+                        <div>
+                            <span class="badge badge-organik mb-1">Organik Kering</span>
+                            <h5 class="fw-bold m-0">Daun Kering, Ranting & Kayu</h5>
+                        </div>
+                    </div>
+                    <p class="text-muted small">Lahan organik padat unsur karbon tinggi dari halaman/taman.</p>
+                    <div class="sample-list"><strong>Contoh:</strong> Daun gugur, ranting pohon, potongan rumput kering, jerami, serbuk gergaji kayu bersih.</div>
+                    <hr class="text-muted opacity-25 my-3">
+                    <h6 class="fw-bold text-success mb-2 small"><i class="bi bi-check-circle-fill me-1"></i> Cara Pengolahan General:</h6>
+                    <ol class="small text-secondary ps-3 mb-0">
+                        <li>Cacah atau potong kecil-kecil agar mempercepat proses pelapukan.</li>
+                        <li>Gunakan sebagai bahan pencampur kompos (unsur cokelat) atau mulsa tanaman.</li>
+                    </ol>
+                </div>
+            </div>
+
+            <!-- 3. Plastik & Kemasan PET/HDPE -->
+            <div class="col-md-6 guide-item" data-category="anorganik" data-keywords="botol plastik gelas air mineral galon jerigen shampoo sabun anorganik">
+                <div class="card h-100 p-4 border-start border-4 border-primary">
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="fs-1 me-3">🍼</div>
+                        <div>
+                            <span class="badge badge-anorganik mb-1">Anorganik / Daur Ulang</span>
+                            <h5 class="fw-bold m-0">Botol, Gelas & Wadah Plastik Keras</h5>
+                        </div>
+                    </div>
+                    <p class="text-muted small">Kemasan kaku plastik polimer yang bernilai daur ulang tinggi.</p>
+                    <div class="sample-list"><strong>Contoh:</strong> Botol air mineral, botol soda, botol sabun cair, galon sekali pakai, botol kosmetik.</div>
+                    <hr class="text-muted opacity-25 my-3">
+                    <h6 class="fw-bold text-primary mb-2 small"><i class="bi bi-check-circle-fill me-1"></i> Cara Pengolahan General:</h6>
+                    <ol class="small text-secondary ps-3 mb-0">
+                        <li>Bilas bersih sisa isi produk dan lepaskan label merek/tutupnya.</li>
+                        <li>Penyetkan atau remukkan botol untuk menghemat ruang, lalu setor ke bank sampah.</li>
+                    </ol>
+                </div>
+            </div>
+
+            <!-- 4. Plastik Fleksibel & Saset -->
+            <div class="col-md-6 guide-item" data-category="anorganik" data-keywords="plastik kresek saset kopi bumbu snack pembungkus ecobrick anorganik">
+                <div class="card h-100 p-4 border-start border-4 border-primary">
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="fs-1 me-3">🛍️</div>
+                        <div>
+                            <span class="badge badge-anorganik mb-1">Anorganik / Daur Ulang</span>
+                            <h5 class="fw-bold m-0">Kantong Kresek & Saset Multilayer</h5>
+                        </div>
+                    </div>
+                    <p class="text-muted small">Plastik tipis lentur dan pembungkus makanan instan.</p>
+                    <div class="sample-list"><strong>Contoh:</strong> Kantong belanja plastik, saset kopi instan, bungkus mie instan, saset bumbu dapur, plastik minyak goreng.</div>
+                    <hr class="text-muted opacity-25 my-3">
+                    <h6 class="fw-bold text-primary mb-2 small"><i class="bi bi-check-circle-fill me-1"></i> Cara Pengolahan General:</h6>
+                    <ol class="small text-secondary ps-3 mb-0">
+                        <li>Cuci bersih saset sisa bumbu dan keringkan.</li>
+                        <li>Kumpulkan dalam wadah untuk dijadikan *Ecobrick* (botol padat sampah plastik) atau setor ke bank sampah khusus.</li>
+                    </ol>
+                </div>
+            </div>
+
+            <!-- 5. Kertas, Buku & Kardus -->
+            <div class="col-md-6 guide-item" data-category="anorganik" data-keywords="kertas hvs buku koran majalah kardus dus karton anorganik">
+                <div class="card h-100 p-4 border-start border-4 border-primary">
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="fs-1 me-3">📦</div>
+                        <div>
+                            <span class="badge badge-anorganik mb-1">Anorganik / Daur Ulang</span>
+                            <h5 class="fw-bold m-0">Kertas, Buku, Koran & Kardus</h5>
+                        </div>
+                    </div>
+                    <p class="text-muted small">Semua material berbasis selulosa kering.</p>
+                    <div class="sample-list"><strong>Contoh:</strong> Kertas HVS, buku tulis bekas, koran, majalah, kardus e-commerce, karton kemasan sepatu.</div>
+                    <hr class="text-muted opacity-25 my-3">
+                    <h6 class="fw-bold text-primary mb-2 small"><i class="bi bi-check-circle-fill me-1"></i> Cara Pengolahan General:</h6>
+                    <ol class="small text-secondary ps-3 mb-0">
+                        <li>Pastikan kertas tidak basah atau terkena minyak/makanan.</li>
+                        <li>Lepaskan staples besi atau selotip plastik, lalu ikat rapi dalam bentuk tumpukan.</li>
+                    </ol>
+                </div>
+            </div>
+
+            <!-- 6. Logam, Kaleng & Aluminium -->
+            <div class="col-md-6 guide-item" data-category="anorganik" data-keywords="kaleng minuman soda susu aluminium besi kawat logam anorganik">
+                <div class="card h-100 p-4 border-start border-4 border-primary">
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="fs-1 me-3">🥫</div>
+                        <div>
+                            <span class="badge badge-anorganik mb-1">Anorganik / Daur Ulang</span>
+                            <h5 class="fw-bold m-0">Kaleng, Logam & Aluminium</h5>
+                        </div>
+                    </div>
+                    <p class="text-muted small">Wadah atau perkakas berbahan dasar logam ringan maupun besi.</p>
+                    <div class="sample-list"><strong>Contoh:</strong> Kaleng minuman bersoda, kaleng susu kental manis, baki aluminium foil, tutup botol logam, kawat sisa.</div>
+                    <hr class="text-muted opacity-25 my-3">
+                    <h6 class="fw-bold text-primary mb-2 small"><i class="bi bi-check-circle-fill me-1"></i> Cara Pengolahan General:</h6>
+                    <ol class="small text-secondary ps-3 mb-0">
+                        <li>Bilas bagian dalam dari sisa cairan manis atau makanan kaleng.</li>
+                        <li>Pipihkan kaleng ringan untuk efisiensi ruang penyimpanan sebelum disetor.</li>
+                    </ol>
+                </div>
+            </div>
+
+            <!-- 7. Botol & Wadah Kaca -->
+            <div class="col-md-6 guide-item" data-category="anorganik" data-keywords="botol kaca toples sirup kecap piring beling anorganik">
+                <div class="card h-100 p-4 border-start border-4 border-primary">
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="fs-1 me-3">🍾</div>
+                        <div>
+                            <span class="badge badge-anorganik mb-1">Anorganik / Daur Ulang</span>
+                            <h5 class="fw-bold m-0">Botol & Toples Kaca (Beling)</h5>
+                        </div>
+                    </div>
+                    <p class="text-muted small">Wadah kaca utuh dari berbagai produk makanan/minuman.</p>
+                    <div class="sample-list"><strong>Contoh:</strong> Botol sirup, botol kecap, toples selai, botol parfum kaca, wadah kaca selai.</div>
+                    <hr class="text-muted opacity-25 my-3">
+                    <h6 class="fw-bold text-primary mb-2 small"><i class="bi bi-check-circle-fill me-1"></i> Cara Pengolahan General:</h6>
+                    <ol class="small text-secondary ps-3 mb-0">
+                        <li>Cuci bersih bagian dalam dan lepaskan tutup karet/plastiknya.</li>
+                        <li>Jaga agar wadah kaca tetap utuh (tidak pecah) agar aman saat didaur ulang.</li>
+                    </ol>
+                </div>
+            </div>
+
+            <!-- 8. Tekstil & Pakaian Bekas -->
+            <div class="col-md-6 guide-item" data-category="anorganik" data-keywords="baju celana kain tekstil sprei jaket perca anorganik">
+                <div class="card h-100 p-4 border-start border-4 border-primary">
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="fs-1 me-3">👕</div>
+                        <div>
+                            <span class="badge badge-anorganik mb-1">Anorganik / Tekstil</span>
+                            <h5 class="fw-bold m-0">Pakaian & Kain Tekstil Bekas</h5>
+                        </div>
+                    </div>
+                    <p class="text-muted small">Produk fesyen dan kain sisa yang sudah tidak terpakai.</p>
+                    <div class="sample-list"><strong>Contoh:</strong> Baju kaus, celana jeans, kain sprei, seragam sekolah, potongan kain perca.</div>
+                    <hr class="text-muted opacity-25 my-3">
+                    <h6 class="fw-bold text-primary mb-2 small"><i class="bi bi-check-circle-fill me-1"></i> Cara Pengolahan General:</h6>
+                    <ol class="small text-secondary ps-3 mb-0">
+                        <li>Sumbangkan pakaian yang masih layak pakai kepada yayasan atau program donasi.</li>
+                        <li>Manfaatkan pakaian rusak menjadi kain lap serbaguna atau bahan kerajinan.</li>
+                    </ol>
+                </div>
+            </div>
+
+            <!-- 9. Baterai & Sampah Elektronik (E-Waste) -->
+            <div class="col-md-6 guide-item" data-category="b3" data-keywords="baterai hp bekas charger kabel aki lampu b3 elektronik">
+                <div class="card h-100 p-4 border-start border-4 border-danger">
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="fs-1 me-3">🔋</div>
+                        <div>
+                            <span class="badge badge-b3 mb-1">Limbah B3</span>
+                            <h5 class="fw-bold m-0">Baterai & Sampah Elektronik (E-Waste)</h5>
+                        </div>
+                    </div>
+                    <p class="text-muted small">Perangkat elektronik rusak yang mengandung logam berat beracun.</p>
+                    <div class="sample-list"><strong>Contoh:</strong> Baterai bekas jam/remot, HP rusak, charger kabel, aki motor, powerbank mati, lampu bohlam/neon.</div>
+                    <hr class="text-muted opacity-25 my-3">
+                    <h6 class="fw-bold text-danger mb-2 small"><i class="bi bi-check-circle-fill me-1"></i> Cara Pengolahan General:</h6>
+                    <ol class="small text-secondary ps-3 mb-0">
+                        <li>Jangan pernah membuang baterai ke tempat sampah umum atau membakarnya.</li>
+                        <li>Simpan di wadah tertutup dan serahkan ke kotak drop-box *E-Waste* resmi.</li>
+                    </ol>
+                </div>
+            </div>
+
+            <!-- 10. Bahan Kimia & Obat Kadaluarsa -->
+            <div class="col-md-6 guide-item" data-category="b3" data-keywords="obat pil sirup pestisida pembersih lantai kimia b3 medis">
+                <div class="card h-100 p-4 border-start border-4 border-danger">
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="fs-1 me-3">💊</div>
+                        <div>
+                            <span class="badge badge-b3 mb-1">Limbah B3 Medis & Kimia</span>
+                            <h5 class="fw-bold m-0">Obat Kadaluarsa & Cairan Pembersih</h5>
+                        </div>
+                    </div>
+                    <p class="text-muted small">Produk farmasi dan cairan kimia rumah tangga sisa.</p>
+                    <div class="sample-list"><strong>Contoh:</strong> Tablet obat kedaluwarsa, sirup obat anak, sisa cairan pembersih lantai kuat, botol pestisida.</div>
+                    <hr class="text-muted opacity-25 my-3">
+                    <h6 class="fw-bold text-danger mb-2 small"><i class="bi bi-check-circle-fill me-1"></i> Cara Pengolahan General:</h6>
+                    <ol class="small text-secondary ps-3 mb-0">
+                        <li>Hancurkan pil/tablet dan campur dengan tanah sebelum dibuang agar tidak disalahgunakan.</li>
+                        <li>Buang cairan kimia dengan diencerkan air mengalir di toilet atau wadah khusus B3.</li>
+                    </ol>
+                </div>
+            </div>
+
+            <!-- 11. Minyak Goreng Bekas (Jelantah) -->
+            <div class="col-md-6 guide-item" data-category="residu" data-keywords="minyak jelantah minyak goreng bekas masak cair khusus">
+                <div class="card h-100 p-4 border-start border-4 border-secondary">
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="fs-1 me-3">🛢️</div>
+                        <div>
+                            <span class="badge badge-residu mb-1">Limbah Khusus / Residu</span>
+                            <h5 class="fw-bold m-0">Minyak Goreng Bekas (Jelantah)</h5>
+                        </div>
+                    </div>
+                    <p class="text-muted small">Sisa minyak hasil penggorengan dapur.</p>
+                    <div class="sample-list"><strong>Contoh:</strong> Minyak jelantah bekas menggoreng ikan, ayam, atau makanan berulang kali.</div>
+                    <hr class="text-muted opacity-25 my-3">
+                    <h6 class="fw-bold text-secondary mb-2 small"><i class="bi bi-check-circle-fill me-1"></i> Cara Pengolahan General:</h6>
+                    <ol class="small text-secondary ps-3 mb-0">
+                        <li>Saring ampas sisa gorengan, lalu masukkan minyak dingin ke dalam botol plastik tertutup.</li>
+                        <li>Setorkan ke pengepul minyak jelantah atau komunitas daur ulang biodiesel/sabun.</li>
+                    </ol>
+                </div>
+            </div>
+
+            <!-- 12. Popok, Pembalut & Residu Sanitasi -->
+            <div class="col-md-6 guide-item" data-category="residu" data-keywords="popok pampers pembalut wanita masker tisu basah kotor residu">
+                <div class="card h-100 p-4 border-start border-4 border-secondary">
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="fs-1 me-3">🧻</div>
+                        <div>
+                            <span class="badge badge-residu mb-1">Sampah Residu</span>
+                            <h5 class="fw-bold m-0">Popok Bayi, Pembalut & Tisu Basah</h5>
+                        </div>
+                    </div>
+                    <p class="text-muted small">Limbah higienis sekali pakai yang terkontaminasi.</p>
+                    <div class="sample-list"><strong>Contoh:</strong> Popok sekali pakai (pampers), pembalut wanita, tisu basah, masker medis bekas pakai.</div>
+                    <hr class="text-muted opacity-25 my-3">
+                    <h6 class="fw-bold text-secondary mb-2 small"><i class="bi bi-check-circle-fill me-1"></i> Cara Pengolahan General:</h6>
+                    <ol class="small text-secondary ps-3 mb-0">
+                        <li>Buang kotoran padat ke dalam kloset dan bilas terlebih dahulu.</li>
+                        <li>Gulung dan bungkus rapat dengan plastik/koran sebelum dibuang ke tong sampah residu khusus.</li>
+                    </ol>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Pesan jika tidak ditemukan -->
+        <div id="noResult" class="text-center py-5 d-none">
+            <i class="bi bi-search display-4 text-muted mb-2"></i>
+            <h5 class="fw-bold text-secondary">Panduan sampah tidak ditemukan</h5>
+            <p class="text-muted small">Coba kata kunci lain seperti 'botol', 'sisa makanan', 'baterai', atau 'minyak'.</p>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        let userId = localStorage.getItem('user_id');
+        let namaUser = localStorage.getItem('nama_user');
+        if (!userId) {
+            window.location.href = 'index.html';
+        } else {
+            document.getElementById('welcomeUserText').innerText = namaUser || 'Profil';
+        }
+
+        function logout() {
+            localStorage.clear();
+            window.location.href = 'index.html';
+        }
+
+        let currentCategory = 'all';
+
+        function filterCategory(cat, btn) {
+            currentCategory = cat;
+            document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            applyFilters();
+        }
+
+        function filterGuides() { applyFilters(); }
+
+        function applyFilters() {
+            const query = document.getElementById('searchInput').value.toLowerCase().trim();
+            const items = document.querySelectorAll('.guide-item');
+            let count = 0;
+
+            items.forEach(item => {
+                const cat = item.getAttribute('data-category');
+                const kw = item.getAttribute('data-keywords');
+                const title = item.querySelector('h5').innerText.toLowerCase();
+                const matchCat = (currentCategory === 'all' || cat === currentCategory);
+                const matchQuery = (query === '' || kw.includes(query) || title.includes(query));
+
+                if (matchCat && matchQuery) {
+                    item.classList.remove('d-none');
+                    count++;
+                } else {
+                    item.classList.add('d-none');
+                }
+            });
+
+            document.getElementById('noResult').classList.toggle('d-none', count > 0);
+        }
+    </script>
+</body>
+</html>
